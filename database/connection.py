@@ -41,3 +41,4 @@ def setup():
             email TEXT
         )
     ''')
+setup()

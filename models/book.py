@@ -6,7 +6,7 @@ def title_formatter():
     words = re.split(r"[\s]+", title)
     final_title = []
     for word in words:
-        if word.lower() not in ["of", "the", "and"]:
+        if word.lower() not in ["of", "an", "the", "and"]:
             capitalized_word = word.capitalize()
         else:
             capitalized_word = word.lower()

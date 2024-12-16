@@ -19,9 +19,10 @@ class User:
         else:
             raise ValueError("Invalid role. Must be either 'M'(member) or 'L'(librarian).") 
         try:
-            cursor.execute("INSERT INTO users (name, email, role) VALUES (?, ?)", (self._name, self._email, self._role))
+            cursor.execute("INSERT INTO users (name, email, role) VALUES (?, ?, ?)", (self._name, self._email, self._role))
             conn.commit()
             self._id = cursor.lastrowid
+            print(f"{self._name} has been successfully registered!\nThey can now log in.")
         except sqlite3.IntegrityError as e:
             print(f"Error registering user: {e}")
     
