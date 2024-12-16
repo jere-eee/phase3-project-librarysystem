@@ -14,9 +14,12 @@ class User:
             self._email = email
         else:
             raise ValueError("Invalid email address. Must have a valid username and domain.") 
-        
+        if role == "M" or role == "L":
+            self._role = role
+        else:
+            raise ValueError("Invalid role. Must be either 'M'(member) or 'L'(librarian).") 
         try:
-            cursor.execute("INSERT INTO users (name, email, role) VALUES (?, ?)", (self._name, self._email, role))
+            cursor.execute("INSERT INTO users (name, email, role) VALUES (?, ?)", (self._name, self._email, self._role))
             conn.commit()
             self._id = cursor.lastrowid
         except sqlite3.IntegrityError as e:
@@ -39,7 +42,7 @@ class User:
     def find_by_id(user_id):
         """Finds and returns user by id if exists."""
         try:
-            cursor.execute("SELECT users.name, users.email FROM users WHERE id = ?", (user_id,))
+            cursor.execute("SELECT users.name, users.email, users.role FROM users WHERE id = ?", (user_id,))
             result = cursor.fetchone()
             if result:
                 return result
@@ -56,18 +59,18 @@ class User:
             try:
                 cursor.execute("UPDATE users SET email = ? WHERE id = ?", (new_email, self._id))
                 conn.commit()
+                print("User ")
             except sqlite3.IntegrityError as e:
                 print(f"Error updating email: {e}")
         else:
             raise ValueError("Invalid email address.")
         
-    @classmethod
-    def delete(cls, user_id):
+    def delete(self):
         """Delete current user from database."""
         try:
-            cursor.execute("DELETE FROM users WHERE id = ?", (user_id))
+            cursor.execute("DELETE FROM users WHERE id = ?", (self._id))
             conn.commit()
-            print(f"User with id {user_id} deleted.")
+            print(f"User with id {self._id} deleted.")
         except Exception as e:
             print(f"Error deleting user: {e}")
             
