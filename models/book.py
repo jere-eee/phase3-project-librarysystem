@@ -2,7 +2,7 @@ import re
 from database.connection import cursor, conn
 import sqlite3
 
-def title_formatter():
+def title_formatter(title):
     words = re.split(r"[\s]+", title)
     final_title = []
     for word in words:

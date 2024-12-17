@@ -5,7 +5,7 @@ from database.connection import cursor, conn
 class User:
     def __init__(self, name, email, role="M"):
         """ Register a user. """
-        if isinstance(name, str):
+        if isinstance(name, str) and len(name) > 0:
             self._name = name
         else:
             raise ValueError("Name must be a string.")
@@ -18,6 +18,8 @@ class User:
             self._role = role
         else:
             raise ValueError("Invalid role. Must be either 'M'(member) or 'L'(librarian).") 
+    
+    def create(self):
         try:
             cursor.execute("INSERT INTO users (name, email, role) VALUES (?, ?, ?)", (self._name, self._email, self._role))
             conn.commit()
@@ -26,8 +28,8 @@ class User:
         except sqlite3.IntegrityError as e:
             print(f"Error registering user: {e}")
     
-    @classmethod
-    def all():
+    @staticmethod
+    def get_all():
         """ Get all users and display."""
         try:
             cursor.execute("SELECT users.name, users.email FROM users")
@@ -56,16 +58,16 @@ class User:
         """Update the email of the current user."""
         name, addr = parseaddr(new_email)
         if "@" in addr and "." in addr.split("@")[-1]:
-            self._email = new_email
             try:
-                cursor.execute("UPDATE users SET email = ? WHERE id = ?", (new_email, self._id))
+                cursor.execute("UPDATE users SET email = ? WHERE email = ?", (new_email, self._email))
                 conn.commit()
-                print("User ")
+                self._email = new_email
+                print("Your email is successfully updated!")
             except sqlite3.IntegrityError as e:
                 print(f"Error updating email: {e}")
         else:
             raise ValueError("Invalid email address.")
-        
+    
     def delete(self):
         """Delete current user from database."""
         try:
@@ -78,7 +80,7 @@ class User:
     @classmethod
     def login(cls, email, role):
         try:
-            cursor.execute("SELECT user.name, user.role FROM users WHERE email = ? AND role = ?", (email, role))
+            cursor.execute("SELECT users.name, users.email, users.role FROM users WHERE email = ? AND role = ?", (email, role))
             return cursor.fetchone()        
         except sqlite3.IntegrityError as e:
             print(f"Error logging in: {e}")
@@ -86,3 +88,6 @@ class User:
     @staticmethod
     def count():
         pass
+    
+    def __repr__(self):
+        return f"{self._name}, role: ({self._role})"
