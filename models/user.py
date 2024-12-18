@@ -1,9 +1,10 @@
 from email.utils import parseaddr
 import sqlite3
 from database.connection import cursor, conn
+import bcrypt
 
 class User:
-    def __init__(self, name, email, role="M"):
+    def __init__(self, name, email, password, role="M"):
         """ Register a user. """
         if isinstance(name, str) and len(name) > 0:
             self._name = name
@@ -18,10 +19,19 @@ class User:
             self._role = role
         else:
             raise ValueError("Invalid role. Must be either 'M'(member) or 'L'(librarian).") 
+        self._password_hash = self.hash_password(password)
+        
+    @staticmethod
+    def hash_password(password):
+        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    
+    @staticmethod
+    def verify_password(password, hashed):
+        return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
     
     def create(self):
         try:
-            cursor.execute("INSERT INTO users (name, email, role) VALUES (?, ?, ?)", (self._name, self._email, self._role))
+            cursor.execute("INSERT INTO users (name, email, role, password) VALUES (?, ?, ?, ?)", (self._name, self._email, self._role, self._password_hash))
             conn.commit()
             self._id = cursor.lastrowid
             print(f"{self._name} has been successfully registered!\nThey can now log in.")
@@ -71,19 +81,29 @@ class User:
     def delete(self):
         """Delete current user from database."""
         try:
-            cursor.execute("DELETE FROM users WHERE id = ?", (self._id))
+            cursor.execute("DELETE FROM users WHERE email = ?", (self._email,))
             conn.commit()
-            print(f"User with id {self._id} deleted.")
+            print(f"You've successfully deleted your account.")
         except Exception as e:
             print(f"Error deleting user: {e}")
             
     @classmethod
-    def login(cls, email, role):
+    def login(cls, email, password):
         try:
-            cursor.execute("SELECT users.name, users.email, users.role FROM users WHERE email = ? AND role = ?", (email, role))
-            return cursor.fetchone()        
+            cursor.execute("SELECT users.name, users.email, users.role, users.password FROM users WHERE email = ? AND role = ?", (email, role))
+            if cursor.fetchone():
+                name, email, role, password_hash = cursor.fetchone()
+                if cls.verify_password(password=password, hashed=password_hash):
+                          return cls(name, email, password_hash, role)
+                else:
+                    print("Invalid password. Try again.")
+                    return None
+            else:
+                print("User not found.")
+                return None
         except sqlite3.IntegrityError as e:
             print(f"Error logging in: {e}")
+            return None
     
     @staticmethod
     def count():

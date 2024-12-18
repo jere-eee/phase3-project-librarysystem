@@ -9,7 +9,8 @@ def setup():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             email TEXT, 
-            role TEXT NOT NULL
+            role TEXT NOT NULL,
+            password TEXT
         )           
     """)
     
