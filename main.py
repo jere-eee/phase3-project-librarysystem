@@ -1,38 +1,81 @@
 import sys
+from models.book import Book
 from models.user import User
 from database.connection import cursor, conn
 
 
 current_user = None
-
+def librarian_menu():
+    global current_user
+    while True:
+        print(f"Welcome, {current_user}!")
+        print("\n1.Add book to collection\n2.View all books\n3.Find Book by Title\n4.Find Book by ID\n5.Delete book\n6.View all users\n7.Exit")
+        
+        choice = input("Pick a number to manage the library: ")
+        
+        if choice == "1":
+            title = input("Enter Book Title: ")
+            author = input("Enter author name: ")
+            copies = input("How many copies? ")
+            book = Book(title, author, copies)
+            book.create()
+        elif choice == "2":
+            result = Book.get_all()
+            for r in result:
+                print(r)
+        elif choice == "3":
+            title = input("Enter book title: ")
+            result = Book.search(title)
+            print(result)
+        elif choice == "4":
+            id = input("Enter book id: ")
+            print(Book.find_by_id(id))
+        
+        elif choice == "5":
+            title = input("Enter book title: ")
+            result = Book.search(title)
+            if result:
+                sure = input(f"Are you sure you'd like to delete {result}? (y/n)").strip().lower()
+                if sure == "y":
+                    Book.delete(title)
+        elif choice == "6":
+            result = User.get_all()
+            for r in result:
+                print(r)
+        elif choice == "7":
+            sys.exit()
 def menu():
     global current_user
     while True:
         print(f"Welcome, {current_user}!")
-        print("\n1.View all users\n2.Find user by id\n3.Update my email\n4.Delete my account\n5.Exit")
+        print("\n1.View all books\n2.Find book by title\n3.Borrow book\n4.Update my email\n5.Delete my account\n6.Exit")
         choice = input("Pick a number and explore: ")
-        
+            
         if choice == "1":
-            result = User.get_all()
+            result = Book.get_all()
             for r in result:
                 print(r)
         
         elif choice == "2":
-            id = input("Enter user id: ")
-            result = User.find_by_id(id)
+            title = input("Enter book title: ")
+            result = Book.search(title)
             print(result)
-            
+        
         elif choice == "3":
+            title = input("Enter book title: ")
+            print(Book.borrow(title))
+            
+        elif choice == "4":
             new_email = input("Type out your new email: ")
             current_user.update_email(new_email=new_email)
             
-        elif choice == "4":
+        elif choice == "5":
             confirm = input("Are you sure you'd like to delete your account? (y/n) ").lower()
             if confirm == "y":
                 current_user.delete()
                 current_user = None
                 main()
-        elif choice == "5":
+        elif choice == "6":
             sys.exit()
 
 def main():
@@ -55,8 +98,10 @@ def main():
             logged = input(f"Would you like to log in as {user}? (y/n) ").lower()
             if logged == "y":
                 current_user = user
-                menu()
-        
+                if current_user._role == "M":
+                    menu()
+                else:
+                    librarian_menu()
         elif choice == "2":
             email = input("Enter your email address: ")
             password = input("Enter password: ")
@@ -65,7 +110,10 @@ def main():
             if result:
                 print(f"{result[0]} successfully logged in!")
                 current_user = User(name=result[0], email=result[1], password=result[2], role=result[3])
-                menu()
+                if current_user._role == "M":
+                    menu()
+                else:
+                    librarian_menu()
             else:
                 print("Invalid credentials or error in logging in.")
         

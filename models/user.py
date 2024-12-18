@@ -90,11 +90,12 @@ class User:
     @classmethod
     def login(cls, email, password):
         try:
-            cursor.execute("SELECT users.name, users.email, users.role, users.password FROM users WHERE email = ? AND role = ?", (email, role))
-            if cursor.fetchone():
-                name, email, role, password_hash = cursor.fetchone()
+            cursor.execute("SELECT users.name, users.email, users.password, users.role FROM users WHERE email = ?", (email,))
+            result = cursor.fetchone()
+            if result:
+                email, password_hash = result[1], result[2]
                 if cls.verify_password(password=password, hashed=password_hash):
-                          return cls(name, email, password_hash, role)
+                    return result
                 else:
                     print("Invalid password. Try again.")
                     return None
