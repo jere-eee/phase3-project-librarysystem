@@ -106,9 +106,10 @@ class User:
             print(f"Error logging in: {e}")
             return None
     
-    @staticmethod
-    def count():
-        pass
+    def get_id(self):
+        result = cursor.execute("SELECT id FROM users WHERE email = ?", (self._email,)).fetchone()
+        if result:
+            return result[0]
     
     def __repr__(self):
         return f"{self._name}, role: ({self._role})"

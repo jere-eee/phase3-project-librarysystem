@@ -48,7 +48,7 @@ def menu():
     global current_user
     while True:
         print(f"Welcome, {current_user}!")
-        print("\n1.View all books\n2.Find book by title\n3.Borrow book\n4.Update my email\n5.Delete my account\n6.Exit")
+        print("\n1.View all books\n2.Find book by title\n3.Borrow book\n4.Return book\n5.Update my email\n6.Delete my account\n7.Exit")
         choice = input("Pick a number and explore: ")
             
         if choice == "1":
@@ -63,19 +63,24 @@ def menu():
         
         elif choice == "3":
             title = input("Enter book title: ")
-            print(Book.borrow(title))
-            
+            user_id = current_user.get_id()
+            Book.borrow(title, user_id)
+        
         elif choice == "4":
+            title = input("Enter book title: ")
+            user_id = current_user.get_id()
+            Book.return_book(title, user_id)
+        elif choice == "5":
             new_email = input("Type out your new email: ")
             current_user.update_email(new_email=new_email)
             
-        elif choice == "5":
+        elif choice == "6":
             confirm = input("Are you sure you'd like to delete your account? (y/n) ").lower()
             if confirm == "y":
                 current_user.delete()
                 current_user = None
                 main()
-        elif choice == "6":
+        elif choice == "7":
             sys.exit()
 
 def main():
