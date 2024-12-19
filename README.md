@@ -1,4 +1,4 @@
-# Library Management System (SQLite)
+# Library Management System (SQLite) By Akanle Jeremy
 
 This is a simple command-line library management system built using Python and the `sqlite3` module for database management. It allows librarians to manage books and users, and members to browse, borrow, and return books.
 
