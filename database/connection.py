@@ -34,12 +34,4 @@ def setup():
         FOREIGN KEY(user_id) REFERENCES users(id),
         FOREIGN KEY(book_id) REFERENCES books(id)
     )""")
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS authors (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            email TEXT
-        )
-    ''')
 setup()

@@ -72,13 +72,14 @@ def menu():
             
         if choice == "1":
             result = Book.get_all()
-            for r in result:
-                print(r)
+            if result:
+                for r in result:
+                    print(f"ID: {r[3]}, Title: {r[0]}, Author: {r[1]}, Copies: {r[2]}")
         
         elif choice == "2":
             title = input("Enter book title: ")
             result = Book.search(title)
-            print(result)
+            print(f"ID: {result[3]}, Title: {result[0]}, Author: {result[1]}, Copies: {result[2]}")
         
         elif choice == "3":
             title = input("Enter book title: ")
