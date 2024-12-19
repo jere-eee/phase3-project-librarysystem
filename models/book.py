@@ -44,7 +44,7 @@ class Book:
     @classmethod
     def get_all(cls):
         try:
-            cursor.execute("SELECT title, author, copies FROM books")
+            cursor.execute("SELECT title, author, copies, id FROM books")
             books = cursor.fetchall()
             return books if books else []
         except sqlite3.IntegrityError as e:

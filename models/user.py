@@ -42,7 +42,7 @@ class User:
     def get_all():
         """ Get all users and display."""
         try:
-            cursor.execute("SELECT users.name, users.email FROM users")
+            cursor.execute("SELECT users.id, users.name, users.email, users.role FROM users")
             result = cursor.fetchall()
             if result:
                 return result
@@ -55,7 +55,7 @@ class User:
     def find_by_id(user_id):
         """Finds and returns user by id if exists."""
         try:
-            cursor.execute("SELECT users.name, users.email, users.role FROM users WHERE id = ?", (user_id,))
+            cursor.execute("SELECT users.id, users.name, users.email, users.role FROM users WHERE id = ?", (user_id,))
             result = cursor.fetchone()
             if result:
                 return result
@@ -63,6 +63,20 @@ class User:
                 raise Exception(f"User with passed id not found.")
         except sqlite3.IntegrityError as e:
             print(f'Error finding user: {e}')
+            
+    @staticmethod
+    def search(name):
+        try:
+            cursor.execute("SELECT id, name, email, role FROM users WHERE name LIKE ?", (f"%{name}%",))
+            result = cursor.fetchall()
+            if result:
+                return result
+            else:
+                print(f"No users found with name {name}.")
+                return []
+        except sqlite3.IntegrityError as e:
+            print(f"Error finding user(s): {e}")
+            return []
     
     def update_email(self, new_email):
         """Update the email of the current user."""

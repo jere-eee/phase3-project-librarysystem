@@ -9,7 +9,7 @@ def librarian_menu():
     global current_user
     while True:
         print(f"Welcome, {current_user}!")
-        print("\n1.Add book to collection\n2.View all books\n3.Find Book by Title\n4.Find Book by ID\n5.Delete book\n6.View all users\n7.Exit")
+        print("\n1.Add book to collection\n2.View all books\n3.Find Book by Title\n4.Find Book by ID\n5.Delete book\n6.View all users\n7.Find user by name/id\n8.Exit")
         
         choice = input("Pick a number to manage the library: ")
         
@@ -21,15 +21,17 @@ def librarian_menu():
             book.create()
         elif choice == "2":
             result = Book.get_all()
-            for r in result:
-                print(r)
+            if result:
+                for r in result:
+                    print(f"ID: {r[3]}, Title: {r[0]}, Author: {r[1]}, Copies: {r[2]}")
         elif choice == "3":
             title = input("Enter book title: ")
             result = Book.search(title)
-            print(result)
+            print(f"ID: {result[3]}, Title: {result[0]}, Author: {result[1]}, Copies: {result[2]}")
         elif choice == "4":
             id = input("Enter book id: ")
-            print(Book.find_by_id(id))
+            book = Book.find_by_id(id)
+            print(f"ID: {book[0]}, Title: {book[1]}, Author: {book[2]}, Copies: {book[3]}")
         
         elif choice == "5":
             title = input("Enter book title: ")
@@ -41,8 +43,25 @@ def librarian_menu():
         elif choice == "6":
             result = User.get_all()
             for r in result:
-                print(r)
+                print(f"ID: {r[0]}, Name: {r[1]}, Email: {r[2]}, Role: {r[3]}")
         elif choice == "7":
+            by = input("Would you like to search by name or id? (n for name/i for id) ").strip().lower()
+            if by == "n":
+                name = input("Enter username: ")
+                result = User.search(name)
+                if result:
+                    for r in result:
+                        print(f"ID: {r[0]}, Name: {r[1]}, Email: {r[2]}, Role: {r[3]}")
+                else:
+                    print("No users found.")
+            elif by == "i":
+                user_id = input("Enter user id: ")
+                result = User.find_by_id(user_id)
+                if result:
+                    print(f"ID: {result[0]}, Name: {result[1]}, Email: {result[2]}, Role: {result[3]}")
+            else:
+                print("Please pick either n for name or i for id.")
+        elif choice == "8":
             sys.exit()
 def menu():
     global current_user
